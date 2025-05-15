@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+	<title>Stegable Vector Graphics</title>
+	<link href="style.css" rel="stylesheet">
+	<link href="https://unpkg.com/@speed-highlight/core/dist/themes/default.css" rel="stylesheet">
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+<div id="hero">
+	<h1>Stegable Vector Graphics</h1>
+	<p>Hide your data inside SVG files. <br>
+		More space compared to classic JPG or PNG files. <br>
+		Unknown method, less likely to be caught.</p>
+</div>
+
+<div id="app">
+	<div class="inputs">
+		<h2>Hide or reveal a message</h2>
+
+		<button class="btn btn-outline" id="choose">
+			<input accept="image/svg+xml" id="file-input" type="file">
+			<img alt="Upload" src="upload.svg">
+			<span>Choose an SVG file</span>
+		</button>
+
+		<label for="payload">Text</label>
+		<textarea id="payload" placeholder="The payload you want to encode. Leave empty to decode."></textarea>
+
+		<label for="key">Password</label>
+		<textarea disabled id="key" placeholder="WIP"></textarea>
+
+		<label for="method">Method</label>
+		<select id="method">
+			<option value="v1">V1 - Sequential, not padded</option>
+			<option value="v2">V2 - Sequential, padded</option>
+		</select>
+
+		<button class="btn btn-primary" disabled id="btn-start">
+			<img alt="Key" src="key.svg">
+			<span>Decode</span>
+		</button>
+	</div>
+
+	<div class="inputs">
+		<div id="output">
+			<p style="font-size: 2rem;">No image loaded</p>
+		</div>
+
+		<button class="btn btn-primary" disabled id="btn-download">
+			<img alt="Download" src="download.svg">
+			Download
+		</button>
+	</div>
+
+	<div id="codiv">
+		<label for="code">SVG Code</label>
+		<div class="shj-lang-xml" id="code" style="height: 100%; width: 100%;"></div>
+	</div>
+</div>
+
+<script defer src="app.js" type="module"></script>
+<script defer src="matrix.js"></script>
+</body>
+</html>
