@@ -47,7 +47,7 @@ fileInput.onchange = e => {
 
 payload.addEventListener('input', e => {
 	const value = e.target.value
-	if (value.length) {
+	if (value.length && reader.result) {
 		primaryButton.removeAttribute('disabled')
 		primaryButton.children[1].textContent = 'Encode'
 	} else {
