@@ -21,11 +21,17 @@
 	<div class="inputs">
 		<h2>Hide or reveal a message</h2>
 
-		<button class="btn btn-outline" id="choose">
-			<input accept="image/svg+xml" id="file-input" type="file">
-			<img alt="Upload" src="upload.svg">
-			<span>Choose an SVG file</span>
-		</button>
+		<div>
+			<button class="btn btn-outline" id="choose">
+				<input accept="image/svg+xml" id="file-input" type="file">
+				<img alt="Upload" src="upload.svg">
+				<span>Choose an SVG file</span>
+			</button>
+			<button class="btn btn-outline" id="example">
+				<img alt="Upload" src="upload.svg">
+				<span>Or open a random demo</span>
+			</button>
+		</div>
 
 		<label for="payload">Text</label>
 		<textarea id="payload" placeholder="The payload you want to encode. Leave empty to decode."></textarea>
@@ -35,8 +41,8 @@
 
 		<label for="method">Method</label>
 		<select id="method">
-			<option value="v1">V1 - Sequential, not padded</option>
-			<option value="v2">V2 - Sequential, padded</option>
+			<option value="v1">V1 - Sequential, padded</option>
+			<option value="v2">V2 - Sequential, unpadded</option>
 		</select>
 
 		<button class="btn btn-primary" disabled id="btn-start">

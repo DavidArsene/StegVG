@@ -3,6 +3,7 @@ import { highlightElement } from 'https://unpkg.com/@speed-highlight/core/dist/i
 
 const fileInput = document.getElementById('file-input')
 const choose = document.getElementById('choose')
+const example = document.getElementById('example')
 const payload = document.getElementById('payload')
 const key = document.getElementById('key')
 const meth = document.getElementById('method')
@@ -13,6 +14,27 @@ const code = document.getElementById('code')
 
 choose.addEventListener('click', _ => {
 	fileInput.click()
+})
+
+const demos = [
+	'dog',
+	'Heckert_GNU',
+	'Survivorship-bias',
+]
+
+example.addEventListener('click', _ => {
+	const randomIndex = Math.floor(Math.random() * demos.length)
+	const demoFile = `preload/${ demos[randomIndex] }.svg`
+	fetch(demoFile)
+		.then(response => response.text())
+		.then(text => {
+			Render(text)
+			fileInput.value = ''
+			payload.value = ''
+			primaryButton.removeAttribute('disabled')
+			downloadButton.setAttribute('disabled', null)
+		})
+		.catch(err => console.error('Error loading example:', err))
 })
 
 const reader = new FileReader()
@@ -47,7 +69,7 @@ fileInput.onchange = e => {
 
 payload.addEventListener('input', e => {
 	const value = e.target.value
-	if (value.length && reader.result) {
+	if (value.length && output.children[0].tagName === 'svg') {
 		primaryButton.removeAttribute('disabled')
 		primaryButton.children[1].textContent = 'Encode'
 	} else {
@@ -55,34 +77,91 @@ payload.addEventListener('input', e => {
 	}
 })
 
-function EncodeMain(message) {
 
-	let bits = ''
-	for (let i = 0; i < message.length; i++) {
-		const n = message.charCodeAt(i)
-		bits += n.toString(2).padStart(8, '0')
+class Method {
+	constructor() {
+		if (new.target === Method) {
+			throw new TypeError('Cannot construct Method instances directly')
+		}
+		this.name = 'base'
 	}
 
-	// TODO: data validation
-	const paths = document.querySelectorAll('#output>svg path')
-	let i = 0
-	for (const path of paths) {
+	encodeCoord(coord) {
+		return ''
+	}
 
+	decodeCoord() {
+		return false
+	}
+
+	decodeResult() {
+		return ''
+	}
+}
+
+
+class MethodV1 extends Method {
+	bits = ''
+	padded = false
+	precision = '000'
+	state = 0
+
+	constructor(message = '', padded = false) {
+		super()
+		this.padded = padded
+
+		for (let i = 0; i < message.length; i++) {
+			const n = message.charCodeAt(i)
+			this.bits += n.toString(2).padStart(8, '0')
+		}
+	}
+
+	encodeCoord(coord = '') {
+		const dot = coord.includes('.') ? '' : '.'
+		const bit = (this.bits)[this.state++] ?? '2' // == '1' ? 1 : 0
+
+		if (bit === '2' && !this.padded) return coord
+
+		return coord + dot + this.precision + bit
+	}
+
+	decodeCoord(coord = '') {
+		if (!coord.endsWith(this.precision + '0') && !coord.endsWith(this.precision + '1')) return false
+
+		const bit = coord.slice(-1)
+		this.bits += bit
+		return true
+	}
+
+	decodeResult() {
+		let result = ''
+		for (let i = 0; i < this.bits.length; i += 8) {
+			const byte = this.bits.slice(i, i + 8)
+			if (byte.length < 8) break
+			const n = parseInt(byte, 2)
+			result += String.fromCharCode(n)
+		}
+		return result
+	}
+}
+
+
+function EncodeMain(message) {
+	const paths = document.querySelectorAll('#output>svg path')
+	const encoder = new MethodV1(message, meth.value === 'v1')
+
+	// TODO: data validation
+	for (const path of paths) {
 		let d = path.getAttribute('d')
+
 		d = d.replaceAll(/[0-9]+\.?[0-9]*/g, (num, _) => {
 			// const n = parseFloat(num)
-			const dot = num.includes('.') ? '' : '.'
-			const prec = '000'
-			const bit = bits[i++] ?? '2' // == '1' ? 1 : 0
-
-			if (bit === '2' && meth.value === 'v1') return num
-
-			return num + dot + prec + bit
+			return encoder.encodeCoord(num)
 		})
 
 		path.setAttribute('d', d)
 	}
-	if (i < bits.length) {
+	if (encoder.state < encoder.bits.length) { // TODO: implementation detail
 		alert('Message too long for V1 and V2, choose a more complex SVG!')
 		Render(reader.result.toString())
 		throw new Error('Message too long')
@@ -93,29 +172,16 @@ function EncodeMain(message) {
 
 function DecodeMain() {
 	const paths = document.querySelectorAll('#output>svg path')
-	let digits = ''
+	const decoder = new MethodV1()
+
 	outer: for (const path of paths) {
-		let d = path.getAttribute('d')
+		const d = path.getAttribute('d')
 
-		// TODO: custom precision
-		const our = d.match(/[0-9]+\.[0-9]*000[012]/g)
-		if (!our) continue
-		for (const o of our) {
-			const bit = o.slice(-1)
-			if (bit === '2') { break outer }
-			digits += bit
-		}
+		for (const num of d.match(/[0-9]+\.[0-9]{2,}/g))
+			if (!decoder.decodeCoord(num)) break outer
 	}
 
-	let result = ''
-	for (let i = 0; i < digits.length; i += 8) {
-		const byte = digits.slice(i, i + 8)
-		if (byte.length < 8) break
-		const n = parseInt(byte, 2)
-		result += String.fromCharCode(n)
-	}
-
-	payload.value = result
+	payload.value = decoder.decodeResult()
 	primaryButton.setAttribute('disabled', null)
 }
 
