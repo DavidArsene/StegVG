@@ -77,119 +77,50 @@ payload.addEventListener('input', e => {
 	}
 })
 
+meth.addEventListener('change', e => {
+	switch (e.target.value) {
+		case 'v1':
+		case 'v2':
+		case 'ascii':
+			key.setAttribute('disabled', null)
+			key.placeholder = 'Not supported for current method.'
+			key.value = ''
+			break
+		case 'xor':
+		case 'aes':
+			key.removeAttribute('disabled')
+			key.placeholder = 'This method requires a password.'
+			break
+		default:
+			alert('Oops my bad')
+	}
+})
 
-class Method {
-	constructor() {
-		if (new.target === Method) {
-			throw new TypeError('Cannot construct Method instances directly')
-		}
-		this.name = 'base'
+primaryButton.addEventListener('click', async _ => {
+	let method
+	switch (meth.value) {
+		case 'v1':
+		case 'v2':
+			const MethodV1 = (await import('./methods/v1.js')).default
+			method = new MethodV1(payload.value, meth.value === 'v1')
+			break
+		case 'ascii':
+			const MethodASCII = (await import('./methods/ascii.js')).default
+			method = new MethodASCII(payload.value)
+			break
+		default:
+			throw new Error('Unknown method selected')
 	}
 
-	encodeCoord(coord) {
-		return ''
-	}
-
-	decodeCoord() {
-		return false
-	}
-
-	decodeResult() {
-		return ''
-	}
-}
-
-
-class MethodV1 extends Method {
-	bits = ''
-	padded = false
-	precision = '000'
-	state = 0
-
-	constructor(message = '', padded = false) {
-		super()
-		this.padded = padded
-
-		for (let i = 0; i < message.length; i++) {
-			const n = message.charCodeAt(i)
-			this.bits += n.toString(2).padStart(8, '0')
-		}
-	}
-
-	encodeCoord(coord = '') {
-		const dot = coord.includes('.') ? '' : '.'
-		const bit = (this.bits)[this.state++] ?? '2' // == '1' ? 1 : 0
-
-		if (bit === '2' && !this.padded) return coord
-
-		return coord + dot + this.precision + bit
-	}
-
-	decodeCoord(coord = '') {
-		if (!coord.endsWith(this.precision + '0') && !coord.endsWith(this.precision + '1')) return false
-
-		const bit = coord.slice(-1)
-		this.bits += bit
-		return true
-	}
-
-	decodeResult() {
-		let result = ''
-		for (let i = 0; i < this.bits.length; i += 8) {
-			const byte = this.bits.slice(i, i + 8)
-			if (byte.length < 8) break
-			const n = parseInt(byte, 2)
-			result += String.fromCharCode(n)
-		}
-		return result
-	}
-}
-
-
-function EncodeMain(message) {
-	const paths = document.querySelectorAll('#output>svg path')
-	const encoder = new MethodV1(message, meth.value === 'v1')
-
-	// TODO: data validation
-	for (const path of paths) {
-		let d = path.getAttribute('d')
-
-		d = d.replaceAll(/[0-9]+\.?[0-9]*/g, (num, _) => {
-			// const n = parseFloat(num)
-			return encoder.encodeCoord(num)
-		})
-
-		path.setAttribute('d', d)
-	}
-	if (encoder.state < encoder.bits.length) { // TODO: implementation detail
-		alert('Message too long for V1 and V2, choose a more complex SVG!')
-		Render(reader.result.toString())
-		throw new Error('Message too long')
-	}
-	payload.value = ''
-	Render(output.innerHTML)
-}
-
-function DecodeMain() {
-	const paths = document.querySelectorAll('#output>svg path')
-	const decoder = new MethodV1()
-
-	outer: for (const path of paths) {
-		const d = path.getAttribute('d')
-
-		for (const num of d.match(/[0-9]+\.[0-9]{2,}/g))
-			if (!decoder.decodeCoord(num)) break outer
-	}
-
-	payload.value = decoder.decodeResult()
-	primaryButton.setAttribute('disabled', null)
-}
-
-primaryButton.addEventListener('click', _ => {
 	if (payload.value.length) {
-		EncodeMain(payload.value)
+		EncodeMain(method)
 		downloadButton.removeAttribute('disabled')
-	} else DecodeMain()
+		primaryButton.children[1].textContent = 'Decode'
+	} else {
+		DecodeMain(method)
+		downloadButton.setAttribute('disabled', null)
+		primaryButton.children[1].textContent = 'Encode'
+	}
 })
 
 downloadButton.addEventListener('click', _ => {
@@ -208,3 +139,37 @@ downloadButton.addEventListener('click', _ => {
 		location.reload()
 	}, 5000)
 })
+
+
+function EncodeMain(encoder) {
+	const paths = document.querySelectorAll('#output>svg path')
+
+	// TODO: data validation
+	for (const path of paths) {
+		let d = path.getAttribute('d')
+
+		d = d.replaceAll(/[0-9]+\.?[0-9]*/g, (num, _) => {
+			// const n = parseFloat(num)
+			return encoder.encodeCoord(num)
+		})
+
+		path.setAttribute('d', d)
+	}
+
+	payload.value = ''
+	Render(output.innerHTML)
+}
+
+function DecodeMain(decoder) {
+	const paths = document.querySelectorAll('#output>svg path')
+
+	outer: for (const path of paths) {
+		const d = path.getAttribute('d')
+
+		for (const num of d.match(/[0-9]+\.[0-9]{2,}/g))
+			if (!decoder.decodeCoord(num)) break outer
+	}
+
+	payload.value = decoder.decodeResult()
+	primaryButton.setAttribute('disabled', null)
+}
