@@ -1,0 +1,4 @@
+<!-- Used to test message overflow checks -->
+<svg height="450" width="450" xmlns="http://www.w3.org/2000/svg">
+	<path d="M 10 100 Q 25 10 180 100 T 250 100 T 320 100 T 390 100" fill="none" stroke="#FFA500" stroke-width="3" />
+</svg>

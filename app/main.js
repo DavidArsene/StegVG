@@ -48,6 +48,8 @@ function Render(txt) {
 	const result = txt.trim()
 	output.innerHTML = result
 	code.textContent = result
+	output.firstElementChild.removeAttribute('class')
+	output.firstElementChild.removeAttribute('id')
 
 	// TODO: Word wrap for paths
 	highlightElement(code)
