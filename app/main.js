@@ -19,6 +19,7 @@ choose.addEventListener('click', _ => {
 const demos = [
 	'dog',
 	'Heckert_GNU',
+	'Invertocat',
 	'Survivorship-bias',
 ]
 

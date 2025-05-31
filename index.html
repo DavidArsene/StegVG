@@ -11,16 +11,23 @@
 
 <canvas id="matrix"></canvas>
 <div id="hero">
-	<h1>Stegable Vector Graphics</h1>
-	<p>Hide your data inside SVG files. <br>
-		More space compared to classic JPG or PNG files. <br>
-		Unknown method, less likely to be caught.</p>
+	<h1 style="grid-area: hero;">Stegable Vector Graphics</h1>
+
+	<p style="grid-area: desc;">Hide your data inside SVG files &nbsp;•<br>
+		More space compared to classic JPG or PNG files &nbsp;•<br>
+		Unknown method, less likely to be caught &nbsp;•</p>
+
+	<a href="https://github.com/DavidArsene/StegVG"
+	   style="grid-area: logo;">
+
+		<img alt="GitHub" height="75" src="preload/Invertocat.svg" width="75">
+		<p>Star on GitHub</p>
+	</a>
 </div>
 
 <div id="app">
 	<div class="inputs">
 		<h2>Hide or reveal a message</h2>
-
 		<div>
 			<button class="btn btn-outline" id="choose">
 				<input accept="image/svg+xml" id="file-input" type="file">
@@ -73,7 +80,6 @@
 		alert(`${ msg }\n\nSource: ${ url } : ${ line }`)
 		return true
 	}
-
 </script>
 <script defer src="app/main.js" type="module"></script>
 <script defer src="app/matrix.js"></script>

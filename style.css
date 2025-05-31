@@ -40,13 +40,17 @@ body {
 }
 
 #hero {
-	position:        relative;
-	display:         flex;
-	align-items:     center;
-	flex-direction:  column;
-	justify-content: center;
-	height:          25vh;
-	text-align:      center;
+	position:              relative;
+	display:               grid;
+	align-items:           center;
+	height:                25vh;
+	text-align:            center;
+	gap:                   0 2.5vh;
+	grid-template-columns: 1.15fr 0.85fr;
+	grid-template-rows: 1fr 1fr;
+	grid-template-areas:
+    "hero hero"
+    "desc logo";
 }
 
 canvas {
@@ -59,15 +63,21 @@ canvas {
 }
 
 #hero h1 {
-	font-size:     3rem;
-	font-weight:   bold;
-	margin-bottom: 1rem;
+	font-size:   3rem;
+	font-weight: bold;
+	margin-top:  2vh;
 }
 
 #hero p {
-	font-size: 1.25rem;
-	margin:    0 auto;
-	color:     var(--color-text-muted);
+	font-size:  1.25rem;
+	text-align: right;
+	color:      var(--color-text-muted);
+}
+
+#hero a {
+	cursor:          pointer;
+	text-decoration: none;
+	justify-self:    left;
 }
 
 .inputs {
