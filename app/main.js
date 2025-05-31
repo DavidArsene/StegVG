@@ -20,6 +20,7 @@ const demos = [
 	'dog',
 	'Heckert_GNU',
 	'Invertocat',
+	'short',
 	'Survivorship-bias',
 ]
 
@@ -47,9 +48,6 @@ function Render(txt) {
 	const result = txt.trim()
 	output.innerHTML = result
 	code.textContent = result
-	output.children[0].removeAttribute('width')
-	output.children[0].removeAttribute('height')
-	// output.children[0].removeAttribute('fill')
 
 	// TODO: Word wrap for paths
 	highlightElement(code)
