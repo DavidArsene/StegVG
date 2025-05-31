@@ -44,12 +44,15 @@
 		<textarea id="payload" placeholder="The payload you want to encode. Leave empty to decode."></textarea>
 
 		<label for="key">Password</label>
-		<textarea disabled id="key" placeholder="WIP"></textarea>
+		<textarea disabled id="key" placeholder="Choose a supported method to enter password."></textarea>
 
 		<label for="method">Method</label>
 		<select id="method">
-			<option value="v1">V1 - Sequential, padded</option>
-			<option value="v2">V2 - Sequential, unpadded</option>
+			<option value="ascii">ASCII Codes (low security)</option>
+			<option value="xor">XOR Cipher (medium security)</option>
+			<option value="aes">AES Encryption (high security)</option>
+			<option value="v1">[Deprecated] Bit by bit, padded with 000, 2 until end</option>
+			<option value="v2">[Deprecated] Bit by bit, padded with 000, 2 at end</option>
 		</select>
 
 		<button class="btn btn-primary" disabled id="btn-start">
@@ -78,6 +81,10 @@
 <script>
 	window.onerror = (msg, url, line) => {
 		alert(`${ msg }\n\nSource: ${ url } : ${ line }`)
+		return true
+	}
+	window.onunhandledrejection = (event) => {
+		alert(`Promise ${ event.reason }`)
 		return true
 	}
 </script>
