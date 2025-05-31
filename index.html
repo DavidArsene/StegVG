@@ -68,6 +68,13 @@
 	</div>
 </div>
 
+<script>
+	window.onerror = (msg, url, line) => {
+		alert(`${ msg }\n\nSource: ${ url } : ${ line }`)
+		return true
+	}
+
+</script>
 <script defer src="app/main.js" type="module"></script>
 <script defer src="app/matrix.js"></script>
 </body>
