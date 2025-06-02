@@ -69,6 +69,7 @@ fileInput.onchange = e => {
 	choose.children[2].innerText = file.name
 	primaryButton.removeAttribute('disabled')
 	downloadButton.setAttribute('disabled', '')
+	example.remove()
 
 	reader.readAsText(file)
 }
@@ -143,7 +144,7 @@ primaryButton.addEventListener('click', async _ => {
 		downloadButton.removeAttribute('disabled')
 		primaryButton.children[1].textContent = 'Decode'
 	} else {
-		decodeMain(await method())
+		await decodeMain(await method())
 		forceDecodeMode = true
 		payload.setAttribute('disabled', '')
 	}
@@ -163,7 +164,7 @@ downloadButton.addEventListener('click', _ => {
 	// couldn't bother resetting state
 	setTimeout(() => {
 		location.reload()
-	}, 5000)
+	}, 10000)
 })
 
 
@@ -203,7 +204,7 @@ function encodeMain(encoder) {
 	renderMain(output.innerHTML)
 }
 
-function decodeMain(decoder) {
+async function decodeMain(decoder) {
 	const paths = document.querySelectorAll('#output>svg path')
 
 	outer: for (const path of paths) {
@@ -216,7 +217,7 @@ function decodeMain(decoder) {
 		}
 	}
 
-	payload.value = decoder.decodeResult()
+	payload.value = await decoder.decodeResult()
 }
 
 function lorem() {

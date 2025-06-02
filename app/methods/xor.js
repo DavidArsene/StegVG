@@ -35,8 +35,7 @@ export default class MethodXOR extends Method {
 		// Hash length is always 32
 		const enc = this.message[this.position] ^ this.password[this.position++ % 32]
 
-		if (enc < 100) return '0' + enc
-		return enc < 10 ? '00' + enc : enc
+		return enc.toString().padStart(3, '0')
 	}
 
 	decodeNext(coord = '') {
