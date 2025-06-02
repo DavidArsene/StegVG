@@ -50,10 +50,10 @@
 		<label for="method">Method</label>
 		<select id="method">
 			<option value="ascii">ASCII Codes (low security)</option>
-			<option value="xor">XOR Cipher (medium security)</option>
-			<option value="aes">AES Encryption (high security)</option>
-			<option value="v1">[Deprecated] Bit by bit, padded with 000, 2 until end</option>
-			<option value="v2">[Deprecated] Bit by bit, padded with 000, 2 at end</option>
+			<option value="xor">XOR Cipher (high-ish security)</option>
+			<option value="aes">AES Encryption (high security, more space required)</option>
+			<option value="v1">[Deprecated] V1 filled with EOM</option>
+			<option value="v2">[Deprecated] V1 with EOM at end</option>
 		</select>
 
 		<button class="btn btn-primary" disabled id="btn-start">
@@ -95,7 +95,7 @@
 <script src="https://unpkg.com/@highlightjs/cdn-assets@latest/languages/xml.min.js"></script>
 
 <script defer src="app/main.js"></script>
-<script defer src="datastar/datastar.js" type="module"></script>
+<!--<script defer src="datastar/datastar.js" type="module"></script>-->
 <script defer src="app/matrix.js"></script>
 </body>
 </html>

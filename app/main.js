@@ -42,6 +42,7 @@ example.addEventListener('click', _ => {
 			fileInput.value = ''
 		})
 		.catch(err => console.error('Error loading example:', err))
+	primaryButton.removeAttribute('disabled')
 })
 
 const reader = new FileReader()
@@ -129,11 +130,11 @@ primaryButton.addEventListener('click', async _ => {
 		case 'xor':
 			const xor = (await import('./methods/xor.js')).default
 			// await coloring caused by crypto.subtle :/
-			method = async val => await xor.newAsync(val, key.value)
+			method = async val => await xor.initXor(val, key.value)
 			break
 		case 'aes':
 			const aes = (await import('./methods/aes.js')).default
-			method = async val => await aes.initCipher(val, key.value)
+			method = async val => await aes.initAes(val, key.value)
 			break
 		default:
 			throw new Error('Method not implemented!')
@@ -197,7 +198,7 @@ function encodeMain(encoder) {
 
 	if (payload.value.length > progress) {
 		renderMain(currentTextForReload)
-		return alert(`SVG too short, used ${ progress } out of ${ payload.value.length } bytes.`)
+		return alert(`SVG too short, used ${ payload.value.length } out of ${ progress } available bytes.`)
 	}
 
 	payload.value = ''

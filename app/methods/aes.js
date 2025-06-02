@@ -11,7 +11,7 @@ export default class MethodAES extends Method {
 		this.readingIv = true
 	}
 
-	static async initCipher(message = '', password = '') {
+	static async initAes(message = '', password = '') {
 		if (password.length > 32) {
 			throw new Error('Do not use passwords longer than 32 characters.')
 		}

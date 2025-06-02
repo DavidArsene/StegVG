@@ -1,9 +1,11 @@
 import Method from './interface.js'
 
+const EOM = '2'
+
 export default class MethodV1 extends Method {
 	bits = ''
 	padded = false
-	precision = '000'
+	precision = '00'
 	state = 0
 
 	constructor(message = '', padded = false) {
@@ -14,14 +16,12 @@ export default class MethodV1 extends Method {
 			const n = message.charCodeAt(i)
 			this.bits += n.toString(2).padStart(8, '0')
 		}
-
-		alert('V1 can run out of space depending on SVG length, use other methods or check if decoding works.')
 	}
 
 	encodeNext() {
-		const bit = (this.bits)[this.state++] ?? '2' // == '1' ? 1 : 0
+		const bit = (this.bits)[this.state++] ?? EOM // == '1' ? 1 : 0
 
-		if (bit === '2' && !this.padded) return null
+		if (bit === EOM && !this.padded) return null
 
 		return this.precision + bit
 	}

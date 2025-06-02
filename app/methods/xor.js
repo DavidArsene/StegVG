@@ -16,7 +16,7 @@ export default class MethodXOR extends Method {
 		this.password = password
 	}
 
-	static async newAsync(message = '', password = '') {
+	static async initXor(message = '', password = '') {
 
 		const msg = message.split('').map(char => char.charCodeAt(0))
 		const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password))
