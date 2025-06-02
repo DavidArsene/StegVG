@@ -4,7 +4,7 @@ const EOM = '01'
 // Keeps the codes in the two-digit range
 const NORMALIZER = 0x1D // not quite 0x20 to leave space for EOM
 
-class MethodASCII extends Method {
+export default class MethodASCII extends Method {
 	chars = [ 0 ]
 
 	constructor(message = '') {
@@ -21,23 +21,22 @@ class MethodASCII extends Method {
 		})
 	}
 
-	encodeCoord(coord = '') {
+	encodeNext() {
 		if (this.chars === null) {
-			return coord
+			return null
 		}
 
-		if (!coord.includes('.')) coord += '.'
 		const code = this.chars.shift()
 
 		if (code === undefined) {
 			this.chars = null // Mark as done
-			return coord + EOM
+			return EOM
 		}
 
-		return coord + (code < 10 ? '0' + code : code)
+		return code < 10 ? '0' + code : code
 	}
 
-	decodeCoord(coord = '') {
+	decodeNext(coord = '') {
 		const code = coord.slice(-2)
 		if (code === EOM) return false
 
@@ -52,5 +51,3 @@ class MethodASCII extends Method {
 		return this.chars.map(code => String.fromCharCode(code + NORMALIZER)).join('')
 	}
 }
-
-export default MethodASCII

@@ -31,7 +31,7 @@
 		<h2>Hide or reveal a message</h2>
 		<div>
 			<button class="btn btn-outline" id="choose">
-				<input accept="image/svg+xml" id="file-input" type="file">
+				<input accept="image/svg+xml" id="file" type="file">
 				<img alt="Upload" src="upload.svg">
 				<span>Choose an SVG file</span>
 			</button>
@@ -41,10 +41,10 @@
 			</button>
 		</div>
 
-		<label for="payload">Text</label>
+		<label for="payload" ondblclick="lorem()">Text</label>
 		<textarea id="payload" placeholder="The payload you want to encode. Leave empty to decode."></textarea>
 
-		<label for="key">Password</label>
+		<label for="key" ondblclick="lorem()">Password</label>
 		<textarea disabled id="key" placeholder="Choose a supported method to enter password."></textarea>
 
 		<label for="method">Method</label>

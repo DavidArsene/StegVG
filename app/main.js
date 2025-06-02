@@ -1,4 +1,4 @@
-const fileInput = document.getElementById('fileInput')
+const fileInput = document.getElementById('file')
 const choose = document.getElementById('choose')
 const example = document.getElementById('example')
 const payload = document.getElementById('payload')
@@ -25,7 +25,7 @@ const demos = [
 ]
 
 function initRender(text = '') {
-	Render(text)
+	renderMain(text)
 	payload.dispatchEvent(new InputEvent('input'))
 	currentTextForReload = text
 	forceDecodeMode = false
@@ -48,7 +48,7 @@ const reader = new FileReader()
 reader.onload = () => initRender(reader.result.toString())
 
 
-function Render(txt) {
+function renderMain(txt) {
 	// SAFETY: Assume user is semi-competent
 	const result = txt.trim()
 	output.innerHTML = result
@@ -56,6 +56,8 @@ function Render(txt) {
 	output.firstElementChild.removeAttribute('class')
 	output.firstElementChild.removeAttribute('id')
 
+	delete code.dataset.highlighted
+	// noinspection JSUnresolvedVariable
 	hljs.highlightElement(code)
 }
 
@@ -80,7 +82,8 @@ payload.addEventListener('input', e => {
 })
 
 function requirePwd(e) {
-	if (e.target.value.length) {
+	// TODO: ugly
+	if (e.target.value.length && output.children[0].tagName === 'svg') {
 		primaryButton.removeAttribute('disabled')
 	} else {
 		primaryButton.setAttribute('disabled', '')
@@ -115,28 +118,32 @@ primaryButton.addEventListener('click', async _ => {
 	switch (meth.value) {
 		case 'v1':
 		case 'v2':
-			const MethodV1 = (await import('./methods/v1.js')).default
-			method = val => new MethodV1(val, meth.value === 'v1')
+			const v1 = (await import('./methods/v1.js')).default
+			method = val => new v1(val, meth.value === 'v1')
 			break
 		case 'ascii':
-			const MethodASCII = (await import('./methods/ascii.js')).default
-			method = val => new MethodASCII(val)
+			const ascii = (await import('./methods/ascii.js')).default
+			method = val => new ascii(val)
 			break
 		case 'xor':
-			const MethodXOR = (await import('./methods/xor.js')).default
+			const xor = (await import('./methods/xor.js')).default
 			// await coloring caused by crypto.subtle :/
-			method = async val => await MethodXOR.newAsync(val, key.value)
+			method = async val => await xor.newAsync(val, key.value)
+			break
+		case 'aes':
+			const aes = (await import('./methods/aes.js')).default
+			method = async val => await aes.initCipher(val, key.value)
 			break
 		default:
 			throw new Error('Method not implemented!')
 	}
 
 	if (payload.value.length && !forceDecodeMode) {
-		EncodeMain(await method(payload.value))
+		encodeMain(await method(payload.value))
 		downloadButton.removeAttribute('disabled')
 		primaryButton.children[1].textContent = 'Decode'
 	} else {
-		DecodeMain(await method())
+		decodeMain(await method())
 		forceDecodeMode = true
 		payload.setAttribute('disabled', '')
 	}
@@ -170,25 +177,30 @@ function encodeMain(encoder) {
 
 		d = d.replaceAll(/[0-9]+\.?[0-9]*/g, (num, _) => {
 			// Maybe zeros should be left alone
-			// if (num === '0') return num // No reasonable regex yet
-			// TODO: bugged?
+			if (num === '0') return num // No reasonable regex yet
 
 			// const n = parseFloat(num)
 			progress++
-			// TODO: unconditional 0 pad
-			return encoder.encodeCoord(num)
+
+			const answer = encoder.encodeNext()
+			if (!answer) return num
+
+			// add 0 to ensure invisible changes
+			if (!num.includes('.')) num += '.0'
+
+			return num + answer
 		})
 
 		path.setAttribute('d', d)
 	}
 
 	if (payload.value.length > progress) {
-		Render(currentTextForReload)
-		return alert(`SVG too short, used ${ progress } out of ${ payload.value.length }.`)
+		renderMain(currentTextForReload)
+		return alert(`SVG too short, used ${ progress } out of ${ payload.value.length } bytes.`)
 	}
 
 	payload.value = ''
-	Render(output.innerHTML)
+	renderMain(output.innerHTML)
 }
 
 function decodeMain(decoder) {
@@ -198,11 +210,19 @@ function decodeMain(decoder) {
 		const d = path.getAttribute('d')
 
 		for (const num of d.match(/[0-9]+\.[0-9]{2,}/g)) {
-			// if (num === '0') continue // Skip zeros
+			if (num === '0') continue // Skip zeros
 
-			if (!decoder.decodeCoord(num)) break outer
+			if (!decoder.decodeNext(num)) break outer
 		}
 	}
 
 	payload.value = decoder.decodeResult()
+}
+
+function lorem() {
+	payload.value = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+		+ ' Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+		+ ' Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+		+ ' Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+	key.value = 'Lorem ipsum dolor sit amet'
 }

@@ -1,9 +1,9 @@
-class Method {
-	encodeCoord(coord) {
-		return ''
+export default class Method {
+	encodeNext() {
+		return null
 	}
 
-	decodeCoord() {
+	decodeNext() {
 		return false
 	}
 
@@ -11,5 +11,3 @@ class Method {
 		return ''
 	}
 }
-
-export default Method

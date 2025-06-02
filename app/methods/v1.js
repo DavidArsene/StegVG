@@ -1,6 +1,6 @@
 import Method from './interface.js'
 
-class MethodV1 extends Method {
+export default class MethodV1 extends Method {
 	bits = ''
 	padded = false
 	precision = '000'
@@ -18,16 +18,15 @@ class MethodV1 extends Method {
 		alert('V1 can run out of space depending on SVG length, use other methods or check if decoding works.')
 	}
 
-	encodeCoord(coord = '') {
+	encodeNext() {
 		const bit = (this.bits)[this.state++] ?? '2' // == '1' ? 1 : 0
 
-		if (bit === '2' && !this.padded) return coord
+		if (bit === '2' && !this.padded) return null
 
-		if (!coord.includes('.')) coord += '.'
-		return coord + this.precision + bit
+		return this.precision + bit
 	}
 
-	decodeCoord(coord = '') {
+	decodeNext(coord = '') {
 		if (!coord.endsWith(this.precision + '0') && !coord.endsWith(this.precision + '1')) return false
 
 		const bit = coord.slice(-1)
@@ -46,5 +45,3 @@ class MethodV1 extends Method {
 		return result
 	}
 }
-
-export default MethodV1
