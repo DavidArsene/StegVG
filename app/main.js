@@ -1,7 +1,4 @@
-import { highlightElement } from 'https://unpkg.com/@speed-highlight/core/dist/index.js'
-
-
-const fileInput = document.getElementById('file-input')
+const fileInput = document.getElementById('fileInput')
 const choose = document.getElementById('choose')
 const example = document.getElementById('example')
 const payload = document.getElementById('payload')
@@ -59,8 +56,7 @@ function Render(txt) {
 	output.firstElementChild.removeAttribute('class')
 	output.firstElementChild.removeAttribute('id')
 
-	// TODO: Word wrap for paths
-	highlightElement(code)
+	hljs.highlightElement(code)
 }
 
 fileInput.onchange = e => {
@@ -164,7 +160,7 @@ downloadButton.addEventListener('click', _ => {
 })
 
 
-function EncodeMain(encoder) {
+function encodeMain(encoder) {
 	const paths = document.querySelectorAll('#output>svg path')
 	let progress = 0
 
@@ -195,7 +191,7 @@ function EncodeMain(encoder) {
 	Render(output.innerHTML)
 }
 
-function DecodeMain(decoder) {
+function decodeMain(decoder) {
 	const paths = document.querySelectorAll('#output>svg path')
 
 	outer: for (const path of paths) {
